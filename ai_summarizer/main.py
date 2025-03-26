@@ -8,7 +8,7 @@ app = FastAPI(title="AI Summarizer API", version="1.0")
 app.include_router(text_summary.router, prefix="/text")
 app.include_router(audio_summary.router, prefix="/audio")
 app.include_router(web_ui.router, prefix="")
-
+ 
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

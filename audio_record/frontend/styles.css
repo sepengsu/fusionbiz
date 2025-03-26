@@ -1,0 +1,109 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.recording-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #555;
+}
+
+input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#recordBtn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#recordBtn:hover {
+    background-color: #45a049;
+}
+
+#recordBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#recordingStatus {
+    text-align: center;
+    margin-top: 10px;
+    color: #666;
+}
+
+#recordingsList {
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    padding: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#recordings {
+    list-style-type: none;
+}
+
+#recordings li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+#recordings li:last-child {
+    border-bottom: none;
+}
+
+.recording-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.recording-link:hover {
+    text-decoration: underline;
+}

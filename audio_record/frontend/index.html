@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>WindowsSoundCapture</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>윈도우 시스템 오디오 레코더</h1>
+
+        <div class="recording-controls">
+            <label for="duration">녹음 시간 (초):</label>
+            <input type="number" id="duration" min="1" max="300" value="10">
+
+            <button id="recordBtn">녹음 시작</button>
+
+            <!-- ✅ 상태 메시지 표시용 -->
+            <p id="recordingStatus" style="margin-top: 10px; color: green;"></p>
+        </div>
+
+        <div id="recordingsList">
+            <h2>녹음 목록</h2>
+            <ul id="recordings"></ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

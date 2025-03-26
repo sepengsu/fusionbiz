@@ -4,6 +4,9 @@ uvicorn
 jinja2
 python-multipart
 
+# Audio processing
+
+
 # AI model dependencies
 openai
 faster-whisper
