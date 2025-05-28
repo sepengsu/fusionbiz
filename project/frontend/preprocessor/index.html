@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>전처리기 설정</title>
+  <link rel="stylesheet" href="/frontend/preprocessor/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📄 텍스트 전처리기</h1>
+
+    <section class="section">
+      <div>
+        <label for="fileInput">텍스트 또는 PDF 파일 업로드</label>
+        <input type="file" id="fileInput" accept=".txt,.pdf">
+
+        <label for="splitMethod">텍스트 분할 방법</label>
+        <select id="splitMethod">
+          <option>RecursiveCharacterTextSplitter</option>
+          <option>CharacterTextSplitter</option>
+          <option>MarkdownHeaderTextSplitter</option>
+        </select>
+
+        <label for="chunkSize">Chunk Size</label>
+        <input type="range" id="chunkSize" min="100" max="2000" value="200">
+        <span id="chunkSizeValue">200</span>
+
+        <label for="chunkOverlap">Chunk Overlap</label>
+        <input type="range" id="chunkOverlap" min="0" max="500" value="0">
+        <span id="chunkOverlapValue">0</span>
+      </div>
+
+      <div>
+        <label for="vectorType">벡터 저장소 유형</label>
+        <select id="vectorType">
+          <option>Chroma</option>
+          <option>FAISS</option>
+        </select>
+
+        <label for="searchType">검색 유형</label>
+        <select id="searchType">
+          <option>similarity</option>
+          <option>mmr</option>
+        </select>
+
+        <label for="topK">검색 결과 수(k)</label>
+        <input type="range" id="topK" min="1" max="10" value="3">
+        <span id="topKValue">3</span>
+
+        <label for="embeddingModel">임베딩 모델</label>
+        <select id="embeddingModel">
+          <option>text-embedding-3-small</option>
+          <option>sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="button-container">
+      <button onclick="processData()" id="processBtn">🚀 데이터 처리</button>
+    </div>
+
+    <div id="loading" class="loading">⚙️ 처리 중입니다...</div>
+    <div id="statusArea" class="status-success"></div>
+
+    <div id="previewArea" class="section preview-section" style="display: none;">
+      <h3>📄 랜덤 청크 문서 미리보기</h3>
+      <p><strong>📁 출처:</strong> <span id="sourceFile"></span></p>
+      <div id="sampleContent" class="preview-content"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("chunkSize").oninput = function() {
+      document.getElementById("chunkSizeValue").innerText = this.value;
+    };
+    document.getElementById("chunkOverlap").oninput = function() {
+      document.getElementById("chunkOverlapValue").innerText = this.value;
+    };
+    document.getElementById("topK").oninput = function() {
+      document.getElementById("topKValue").innerText = this.value;
+    };
+
+    function processData() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return alert("파일을 업로드하세요.");
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("chunk_size", document.getElementById("chunkSize").value);
+      formData.append("chunk_overlap", document.getElementById("chunkOverlap").value);
+      formData.append("embedding_model", document.getElementById("embeddingModel").value);
+      formData.append("vector_type", document.getElementById("vectorType").value);
+
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("statusArea").innerText = "";
+      document.getElementById("previewArea").style.display = "none";
+
+      fetch("/upload_log", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("statusArea").innerText = `✅ 데이터 처리 완료!`;
+        document.getElementById("sourceFile").innerText = data.filename;
+        document.getElementById("sampleContent").innerText = data.sample || "미리보기 없음";
+        document.getElementById("previewArea").style.display = "block";
+      })
+      .catch(err => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("statusArea").innerText = `❌ 처리 실패: ${err}`;
+      });
+    }
+  </script>
+</body>
+</html>

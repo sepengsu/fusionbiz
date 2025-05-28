@@ -3,6 +3,6 @@ uvicorn
 pydantic
 openai
 tqdm
-faiss-cpu           # or faiss-gpu if using CUDA
+faiss-cpu         # or faiss-gpu if using CUDA
 sentence-transformers
 python-multipart    # for file uploads
