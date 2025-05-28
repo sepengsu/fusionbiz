@@ -1,0 +1,74 @@
+[SQL 가이드라인]
+
+이 문서는 공장 로그 데이터를 SQL로 질의하는 방법에 대한 안내입니다.
+각 질의 유형에 대해 사용자가 어떤 식으로 질문할 수 있고, 그것이 어떤 SQL로 변환되는지 설명합니다.
+
+---
+
+📌 [테이블 구조]
+
+- Year (int): 연도
+- Month (int): 월
+- Day (int): 일
+- Hour (int): 시
+- Minute (int): 분
+- operation (str): 상태 값 (예: 'error', 'stopped', 'operating')
+
+---
+
+📊 [기본 SQL 예시]
+
+1. 특정 날짜에 발생한 오류 개수:
+질문: "1월 29일 오류 몇 번?"
+SQL: 
+SELECT COUNT(*) FROM logs 
+WHERE Year = 2021 AND Month = 1 AND Day = 29 AND operation = 'error';
+
+---
+
+2. 특정 시간대의 정지 횟수:
+질문: "오전 9시에 정지 몇 번?"
+SQL:
+SELECT COUNT(*) FROM logs 
+WHERE Year = 2021 AND Month = 1 AND Day = 29 AND Hour = 9 AND operation = 'stopped';
+
+---
+
+3. 날짜별 오류 수 추이 보기:
+질문: "날짜별 오류 수를 보고 싶어"
+SQL:
+SELECT Day, COUNT(*) as error_count 
+FROM logs 
+WHERE operation = 'error' 
+GROUP BY Day ORDER BY Day;
+
+---
+
+4. 오류 후 정지로 이어진 경우의 비율:
+질문: "오류가 정지로 이어진 경우는 몇 %야?"
+SQL (가능한 처리):
+→ 시간순 정렬 후 lag 사용 필요 (Python 처리 권장)
+
+---
+
+📘 [주의사항]
+
+- 모든 필드는 int 또는 str 타입입니다.
+- 날짜 계산 시 'Hour', 'Minute'를 함께 고려해야 정밀도 향상
+- 복합 조건(ex. 오류+정지+작동)은 순서 정보가 필요하며 SQL만으로는 어려울 수 있음
+
+---
+
+🧠 [용어 매핑 힌트]
+
+| 자연어 표현     | SQL 표현 예시                      |
+|--------------|-------------------------------|
+| 몇 번         | COUNT(*)                       |
+| 언제          | WHERE Hour = ...              |
+| 오류 발생     | operation = 'error'           |
+| 작동 시작     | operation = 'operating'       |
+| 정지 상태     | operation = 'stopped'         |
+| 날짜별 비교   | GROUP BY Day                  |
+
+---
+

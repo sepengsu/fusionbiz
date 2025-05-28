@@ -60,6 +60,14 @@
       <button onclick="processData()" id="processBtn">🚀 데이터 처리</button>
     </div>
 
+    <hr>
+
+    <h3>📘 SQL 가이드 문서 업로드</h3>
+    <div>
+      <input type="file" id="sqlFileInput" accept=".txt">
+      <button onclick="uploadSQLGuide()">🧠 SQL 문서 처리</button>
+    </div>
+
     <div id="loading" class="loading">⚙️ 처리 중입니다...</div>
     <div id="statusArea" class="status-success"></div>
 
@@ -107,6 +115,33 @@
         document.getElementById("sourceFile").innerText = data.filename;
         document.getElementById("sampleContent").innerText = data.sample || "미리보기 없음";
         document.getElementById("previewArea").style.display = "block";
+      })
+      .catch(err => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("statusArea").innerText = `❌ 처리 실패: ${err}`;
+      });
+    }
+
+    function uploadSQLGuide() {
+      const file = document.getElementById("sqlFileInput").files[0];
+      if (!file) return alert("SQL 가이드 파일을 선택하세요.");
+
+      const formData = new FormData();
+      formData.append("sqlfile", file);
+      formData.append("embedding_model", document.getElementById("embeddingModel").value);
+
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("statusArea").innerText = "";
+      document.getElementById("previewArea").style.display = "none";
+
+      fetch("/upload_sql_guide", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("statusArea").innerText = `✅ SQL 가이드 처리 완료: ${file.name}`;
       })
       .catch(err => {
         document.getElementById("loading").style.display = "none";

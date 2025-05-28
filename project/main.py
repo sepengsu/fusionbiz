@@ -6,12 +6,19 @@ import shutil
 import os
 import torch
 import random
+from dotenv import load_dotenv
 
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+print("env 파일 있음" if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")) else "env 파일 없음")
+print(f"환경 변수 openai_api_key 로빙 완료" if os.getenv("OPENAI_API_KEY") else "환경 변수 openai_api_key 없음")
 from rag_engine.retriever import get_top_chunks
 from rag_engine.responder import generate_response
 from rag_engine.processor import preprocess_log_file
 from rag_engine.config_manager import save_config, load_config
 from rag_engine.chain.chat_router import handle_question
+
+
+# 환경 변수 로드
 
 app = FastAPI()
 
@@ -31,8 +38,7 @@ os.makedirs(CHUNK_DIR, exist_ok=True)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"[INFO] Using device: {device}")
 
-# 정적 파일 제공
-app.mount("/frontend", StaticFiles(directory=BASE_DIR), name="frontend")
+print("[INFO] 환경 변수 로드 완료")
 
 @app.get("/chat_config")
 def get_chat_config():
@@ -96,11 +102,13 @@ def upload_log(
     }
 
 
+from rag_engine.chain.chat_router import handle_question
+
 @app.post("/ask")
 def ask_question(query: QueryRequest):
     result = handle_question(query.question, VECTOR_DIR, CHUNK_DIR, device)
-    result["device"] = str(device)
     return result
+
 
 
 import faiss

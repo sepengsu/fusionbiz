@@ -1,9 +1,10 @@
 import openai
 import os
-OPEN_API_KEY = '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'  # 여기에 OpenAI API 키를 입력하세요
+from dotenv import load_dotenv
+load_dotenv('./.env')  if os.path.exists('./.env') else load_dotenv('../.env')  # 환경변수 파일 로드
 
 def load_api_key():
-    api_key = os.getenv("OPENAI_API_KEY", OPEN_API_KEY) # 환경변수에서 API 키를 가져오거나 기본값 사용
+    api_key = os.getenv("OPENAI_API_KEY") # 환경변수에서 API 키를 가져오거나 기본값 사용
     if not api_key:
         print("[⚠️] OPENAI_API_KEY 환경변수가 설정되지 않았습니다.")
         api_key = input("🔑 OpenAI API Key를 입력하세요: ").strip()
