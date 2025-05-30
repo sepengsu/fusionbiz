@@ -1,0 +1,10 @@
+- Year (int): 연도
+- Month (int): 월
+- Day (int): 일
+- Hour (int): 시
+- Minute (int): 분
+- operation (str): 상태 값 (예: 'error', 'stopped', 'operating')
+
+---
+
+📊 [기본 SQL 예시]

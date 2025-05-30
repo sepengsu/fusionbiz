@@ -1,0 +1,7 @@
+1. 특정 날짜에 발생한 오류 개수:
+질문: "1월 29일 오류 몇 번?"
+SQL: 
+SELECT COUNT(*) FROM logs 
+WHERE Year = 2021 AND Month = 1 AND Day = 29 AND operation = 'error';
+
+---

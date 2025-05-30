@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot 설정</title>
+  <link rel="stylesheet" href="/frontend/chatbotsetting/style.css">
+</head>
+<body>
+  <div class="container">
+    <section class="section">
+      <h2>🧠 LLM 모델 설정</h2>
+      <label for="modelSelect">LLM 모델 선택</label>
+      <select id="modelSelect">
+        <option value="gpt-4">gpt-4</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+      </select>
+
+      <label for="temperature">Temperature: <span id="tempValue">0.7</span></label>
+      <input type="range" id="temperature" min="0" max="1" step="0.01" value="0.7">
+
+      <label for="classificationMode">질문 분류 방식</label>
+      <select id="classificationMode">
+        <option value="keyword">키워드 기반</option>
+        <option value="embedding">벡터 유사도 기반</option>
+      </select>
+    </section>
+
+    <section class="section">
+      <h2>📜 시스템 프롬프트</h2>
+      <textarea id="systemPrompt" rows="5" placeholder="AI의 역할을 설명해 주세요"></textarea>
+    </section>
+
+    <section class="section">
+      <h2>🔖 유저 프롬프트 템플릿</h2>
+      <textarea id="userPrompt" rows="3" placeholder="예: 최근 대화: {chat_history}\n검색 결과: {context}\n질문: {query}"></textarea>
+    </section>
+
+    <div class="button-container">
+      <button onclick="saveConfig()">💾 설정 저장</button>
+    </div>
+
+    <div id="statusMessage" class="status"></div>
+  </div>
+
+  <script src="/frontend/chatbotsetting/config.js"></script>
+</body>
+</html>

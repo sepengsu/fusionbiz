@@ -32,8 +32,29 @@ label {
   color: #facc15;
 }
 
+/* ✅ 드롭다운 확장 스타일 개선 */
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: none;
+  background-color: #3a3a3a;
+  color: white;
+
+  white-space: nowrap;
+  overflow-x: auto;
+  text-overflow: ellipsis;
+
+  /* ✅ 추가: 길고 많은 옵션 표시 대비 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* 화살표 표시를 위한 background-image 등은 필요 시 추가 가능 */
+
 input[type="file"],
-select,
 input[type="range"] {
   width: 100%;
   padding: 10px;
@@ -112,4 +133,56 @@ button:hover {
   font-family: monospace;
   color: #e5e5e5;
   border: 1px solid #444;
+}
+
+/* 로그 업로드 전용 섹션 */
+.log-section {
+  margin-top: 50px;
+  padding: 20px;
+  border: 2px dashed #444;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+}
+
+.log-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #7dd3fc;
+}
+
+.log-section input[type="file"] {
+  background-color: #3a3a3a;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.log-section button {
+  background-color: #22c55e;
+  color: white;
+  font-weight: bold;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.log-section button:hover {
+  background-color: #16a34a;
+}
+
+#log-upload-result {
+  margin-top: 15px;
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  white-space: pre-line;
+  color: #fef9c3;
 }

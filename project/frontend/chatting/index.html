@@ -7,16 +7,6 @@
   <link rel="stylesheet" href="/frontend/chatting/style.css" />
 </head>
 <body>
-  <header>
-    <h1>Tokbom "RAG로 톡!! BeomAI와 함께 만들어보세요" 🍕</h1>
-  </header>
-
-  <nav>
-    <a href="/frontend/preprocessor/index.html">Retriever</a>
-    <a href="/frontend/chatbot/index.html">Chatbot 설정</a>
-    <a href="/frontend/chatting/index.html" class="active">Rag_chatbot</a>
-  </nav>
-
   <main class="container">
     <section class="guide">
       <h2>🧠 RAG Chatbot 사용 가이드</h2>
@@ -25,7 +15,7 @@
         <li><strong>답변 확인:</strong> AI가 문서에서 관련 정보를 찾아 답변합니다</li>
         <li><strong>참고 문서 확인:</strong> AI가 참고한 내용을 표시합니다</li>
         <li><strong>대화 초기화:</strong> 새 주제의 대화를 시작할 수 있습니다</li>
-        <li><span style="color: orange;">⚠️ 먼저 Retriever 탭에서 문서를 업로드하고 처리하세요.</span></li>
+        <li><span class="warning-text">⚠️ 먼저 Retriever 탭에서 문서를 업로드하고 처리하세요.</span></li>
       </ul>
     </section>
 
@@ -36,9 +26,15 @@
     </section>
 
     <section class="chat-info">
-      <div>현재 세션: <code id="sessionId">ID: abc123...</code></div>
-      <div>벡터 DB 상태: <span id="vectorStatus" class="status warning">확인 중...</span></div>
-      <div>문서 수: <span id="docCount">-</span></div>
+      <section class="db-status">
+        <div class="db-status-item" id="sql-status">SQL 상태 로딩중...</div>
+      </section>
+      <section class="manual-status">
+        <div class="db-status-item" id="manual-status">MANUAL 상태 로딩중...</div>
+      </section>
+      <section class="log-status">
+        <div class="db-status-item" id="log-status">LOG 상태 로딩중...</div>
+      </section>
     </section>
 
     <section class="chat-history" id="chatHistory">
@@ -46,47 +42,6 @@
     </section>
   </main>
 
-  <script>
-    function ask() {
-      const input = document.getElementById('userInput');
-      const message = input.value.trim();
-      if (!message) return;
-
-      const chat = document.createElement('div');
-      chat.className = 'chat user';
-      chat.innerText = message;
-      document.getElementById('chatHistory').appendChild(chat);
-
-      input.value = '';
-      // TODO: 백엔드에 fetch로 질의하고 응답 추가
-    }
-
-    function resetChat() {
-      document.getElementById('chatHistory').innerHTML = '';
-      document.getElementById('sessionId').innerText = 'ID: ' + Math.random().toString(36).slice(2, 10);
-    }
-
-    async function updateStatus() {
-      try {
-        const res = await fetch('/api/vector_status');
-        const data = await res.json();
-        const vectorSpan = document.getElementById('vectorStatus');
-        const docCountSpan = document.getElementById('docCount');
-
-        vectorSpan.textContent = data.loaded ? '✅ 로드됨' : '⚠️ 미로드';
-        vectorSpan.className = data.loaded ? 'status ok' : 'status warning';
-
-        docCountSpan.textContent = data.doc_count;
-      } catch (e) {
-        console.error('벡터 상태 확인 실패:', e);
-        document.getElementById('vectorStatus').textContent = '❌ 오류';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      resetChat();
-      updateStatus();
-    });
-  </script>
+  <script src="/frontend/chatting/chat.js"></script>
 </body>
 </html>

@@ -1,0 +1,61 @@
+.
+├── __pycache__
+│   └── main.cpython-312.pyc
+├── config
+│   ├── chat_config.json
+│   └── config_manager.py
+├── data
+│   ├── factory
+│   │   └── machine_data_kor.txt
+│   ├── manual
+│   │   ├── processed_chunks
+│   │   └── vector_store
+│   ├── raw_file
+│   │   └── sql_guide.txt
+│   └── sqlguide
+│       ├── processed_chunks
+│       └── vector_store
+├── frontend
+│   ├── chatbot
+│   │   ├── index.html
+│   │   └── style.css
+│   ├── chatting
+│   │   ├── index.html
+│   │   └── style.css
+│   ├── go.bat
+│   ├── index.html
+│   └── preprocessor
+│       ├── index.html
+│       └── style.css
+├── main.py
+├── project_structure.txt
+└── rag_engine
+    ├── __pycache__
+    │   ├── __init__.cpython-312.pyc
+    │   ├── config_manager.cpython-312.pyc
+    │   ├── processor.cpython-312.pyc
+    │   ├── responder.cpython-312.pyc
+    │   └── retriever.cpython-312.pyc
+    ├── chain
+    │   ├── __init__.py
+    │   ├── __pycache__
+    │   │   ├── __init__.cpython-312.pyc
+    │   │   ├── chat_router.cpython-312.pyc
+    │   │   ├── classifier.cpython-312.pyc
+    │   │   ├── count_executor.cpython-312.pyc
+    │   │   ├── rag_executor.cpython-312.pyc
+    │   │   └── sql_executor.cpython-312.pyc
+    │   ├── classifier
+    │   │   └── classifier.py
+    │   ├── excution
+    │   │   ├── manual_executor.py
+    │   │   └── sql_executor.py
+    │   └── routing
+    │       └── chat_router.py
+    ├── responder
+    │   └── formatter.py
+    └── retriever
+        ├── manual_retriever.py
+        └── sql_retriever.py
+
+24 directories, 34 files

@@ -1,0 +1,9 @@
+3. 날짜별 오류 수 추이 보기:
+질문: "날짜별 오류 수를 보고 싶어"
+SQL:
+SELECT Day, COUNT(*) as error_count 
+FROM logs 
+WHERE operation = 'error' 
+GROUP BY Day ORDER BY Day;
+
+---

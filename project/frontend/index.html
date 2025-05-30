@@ -30,6 +30,7 @@
       text-decoration: none;
       color: #6ee7b7;
       font-size: 16px;
+      cursor: pointer;
     }
     nav a:hover {
       background-color: #374151;
@@ -38,7 +39,21 @@
       border-bottom: 3px solid #ef4444;
       color: #facc15;
     }
+    iframe {
+      width: 100%;
+      height: calc(100vh - 120px);
+      border: none;
+    }
   </style>
+  <script>
+    function loadContent(path, clicked) {
+      document.getElementById('content-frame').src = path;
+
+      // active 클래스 업데이트
+      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+      clicked.classList.add('active');
+    }
+  </script>
 </head>
 <body>
   <header>
@@ -46,9 +61,11 @@
   </header>
 
   <nav>
-    <a href="/frontend/preprocessor/index.html" class="active">Retriever</a>
-    <a href="/frontend/chatbot/index.html">Chatbot 설정</a>
-    <a href="/frontend/chatting/index.html">Rag_chatbot</a>
+    <a class="active" onclick="loadContent('/frontend/preprocessor/index.html', this)">Retriever</a>
+    <a onclick="loadContent('/frontend/chatbotsetting/index.html', this)">Chatbot 설정</a>
+    <a onclick="loadContent('/frontend/chatting/index.html', this)">Rag_chatbot</a>
   </nav>
+
+  <iframe id="content-frame" src="/frontend/preprocessor/index.html"></iframe>
 </body>
 </html>

@@ -8,37 +8,47 @@ import torch
 import random
 from dotenv import load_dotenv
 
+from rag_engine.processor.chunker import chunk_file
+from rag_engine.processor.vector_saver import save_faiss_index
+from config.config_manager import save_config, load_config
+from rag_engine.chain.routing.chat_router import handle_question
+from rag_engine.processor.db_loader import load_log_file_to_sqlite
+
+# ------------------------- 환경 설정 -------------------------
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 print("env 파일 있음" if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")) else "env 파일 없음")
-print(f"환경 변수 openai_api_key 로빙 완료" if os.getenv("OPENAI_API_KEY") else "환경 변수 openai_api_key 없음")
-from rag_engine.retriever import get_top_chunks
-from rag_engine.responder import generate_response
-from rag_engine.processor import preprocess_log_file
-from rag_engine.config_manager import save_config, load_config
-from rag_engine.chain.chat_router import handle_question
-
-
-# 환경 변수 로드
+print(f"환경 변수 openai_api_key 로딩 완료" if os.getenv("OPENAI_API_KEY") else "환경 변수 openai_api_key 없음")
 
 app = FastAPI()
 
-# 디렉토리 설정
+# ------------------------- 디렉토리 경로 -------------------------
 BASE_DIR = "frontend"
 PREPROCESSOR_DIR = os.path.join(BASE_DIR, "preprocessor")
-CHATBOT_DIR = os.path.join(BASE_DIR, "chatbot")
+CHATBOT_DIR = os.path.join(BASE_DIR, "chatbotsetting")
 CHATTING_DIR = os.path.join(BASE_DIR, "chatting")
-DATA_DIR = "data/raw_logs"
-CHUNK_DIR = "data/processed_chunks"
-VECTOR_DIR = "data/vector_store"
 
-os.makedirs(DATA_DIR, exist_ok=True)
-os.makedirs(CHUNK_DIR, exist_ok=True)
+DATA_BASE = "data"
+RAW_DIR = os.path.join(DATA_BASE, "raw_file")
+CHUNK_BASE = {
+    "manual": os.path.join(DATA_BASE, "manual", "processed_chunks"),
+    "sql": os.path.join(DATA_BASE, "sqlguide", "processed_chunks")
+}
+VECTOR_BASE = {
+    "manual": os.path.join(DATA_BASE, "manual", "vector_store"),
+    "sql": os.path.join(DATA_BASE, "sqlguide", "vector_store")
+}
 
-# 디바이스 설정
+os.makedirs(RAW_DIR, exist_ok=True)
+for path in list(CHUNK_BASE.values()) + list(VECTOR_BASE.values()):
+    os.makedirs(path, exist_ok=True)
+
+# ------------------------- 정적 파일 마운트 -------------------------
+app.mount("/frontend", StaticFiles(directory=BASE_DIR), name="frontend")
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"[INFO] Using device: {device}")
 
-print("[INFO] 환경 변수 로드 완료")
+# ------------------------- 설정 API -------------------------
 
 @app.get("/chat_config")
 def get_chat_config():
@@ -50,24 +60,13 @@ async def set_chat_config(request: Request):
     save_config(config)
     return {"message": "✅ 설정이 저장되었습니다."}
 
-class QueryRequest(BaseModel):
-    question: str
+# ------------------------- 메인 화면 -------------------------
 
 @app.get("/", response_class=HTMLResponse)
 def serve_main():
     return FileResponse(path=os.path.join(BASE_DIR, "index.html"))
 
-@app.get("/preprocessor", response_class=HTMLResponse)
-def serve_preprocessor():
-    return FileResponse(path=os.path.join(PREPROCESSOR_DIR, "index.html"))
-
-@app.get("/chatbot", response_class=HTMLResponse)
-def serve_chatbot():
-    return FileResponse(path=os.path.join(CHATBOT_DIR, "index.html"))
-
-@app.get("/chatting", response_class=HTMLResponse)
-def serve_chatting():
-    return FileResponse(path=os.path.join(CHATTING_DIR, "index.html"))
+# ------------------------- 데이터 업로드 및 벡터 저장 -------------------------
 
 @app.post("/upload_log")
 def upload_log(
@@ -75,69 +74,83 @@ def upload_log(
     chunk_size: int = Form(200),
     chunk_overlap: int = Form(0),
     embedding_model: str = Form("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"),
-    vector_type: str = Form("FAISS")
+    vector_type: str = Form("FAISS"),
+    process_type: str = Form("manual")
 ):
-    filepath = os.path.join(DATA_DIR, file.filename)
-    with open(filepath, "wb") as buffer:
+    filename = file.filename
+    file_path = os.path.join(RAW_DIR, filename)
+    with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    preprocess_log_file(filepath, CHUNK_DIR, VECTOR_DIR, device=device)
+    chunk_dir = CHUNK_BASE.get(process_type)
+    vector_dir = VECTOR_BASE.get(process_type)
+    chunks = chunk_file(file_path, chunk_dir, chunk_size, chunk_overlap)
 
-    # 랜덤 청크 미리보기
+    index_path = os.path.join(vector_dir, "index.faiss")
+    save_faiss_index(chunks, index_path, model_name=embedding_model)
+
     sample_text = ""
     try:
-        chunk_files = [f for f in os.listdir(CHUNK_DIR) if f.endswith(".txt")]
+        chunk_files = [f for f in os.listdir(chunk_dir) if f.endswith(".txt")]
         if chunk_files:
             random_file = random.choice(chunk_files)
-            with open(os.path.join(CHUNK_DIR, random_file), "r", encoding="utf-8") as f:
+            with open(os.path.join(chunk_dir, random_file), "r", encoding="utf-8") as f:
                 sample_text = f.read()
     except Exception as e:
         sample_text = f"미리보기 오류: {str(e)}"
 
     return {
         "status": "uploaded and processed",
-        "filename": file.filename,
+        "filename": filename,
         "device": str(device),
         "sample": sample_text.strip()
     }
 
+# ------------------------- 질문 응답 API -------------------------
 
-from rag_engine.chain.chat_router import handle_question
+class QueryRequest(BaseModel):
+    question: str
 
 @app.post("/ask")
 def ask_question(query: QueryRequest):
-    result = handle_question(query.question, VECTOR_DIR, CHUNK_DIR, device)
+    result = handle_question(
+        question=query.question,
+        vector_dir_map=VECTOR_BASE,
+        device=device
+    )
     return result
 
-
-
-import faiss
+# ------------------------- 벡터 상태 확인 -------------------------
 
 @app.get("/api/vector_status")
 def get_vector_status():
-    try:
-        # 실제 인덱스 불러보기를 시도
-        index_path = os.path.join(VECTOR_DIR, "index.faiss")
-        loaded = False
-        if os.path.exists(index_path):
-            try:
-                _ = faiss.read_index(index_path)
-                loaded = True
-            except:
-                loaded = False
+    keys = ["manual", "sql", "log"]
 
-        # 문서 수 확인
-        chunk_files = [f for f in os.listdir(CHUNK_DIR) if f.endswith(".txt")]
-        doc_count = len(chunk_files)
+    result = {}
+    for key in keys:
+        try:
+            index_path = os.path.join(VECTOR_BASE.get(key, ""), "index.faiss")
+            loaded = os.path.exists(index_path)
 
-        return JSONResponse(content={
-            "loaded": loaded,
-            "doc_count": doc_count
-        })
+            chunk_dir = CHUNK_BASE.get(key, "")
+            chunk_files = os.listdir(chunk_dir) if os.path.isdir(chunk_dir) else []
+            doc_count = len([f for f in chunk_files if f.endswith(".txt")])
 
-    except Exception as e:
-        return JSONResponse(content={
-            "loaded": False,
-            "doc_count": 0,
-            "error": str(e)
-        }, status_code=500)
+            result[key] = {
+                "loaded": loaded,
+                "doc_count": doc_count
+            }
+        except Exception as e:
+            result[key] = {
+                "loaded": False,
+                "doc_count": 0,
+                "error": str(e)
+            }
+
+    return JSONResponse(content=result)
+
+
+# ------------------------- db 생성 -------------------------
+@app.post("/upload_log_to_db")
+def upload_log_to_sqlite(file: UploadFile = File(...)):
+    return load_log_file_to_sqlite(file)

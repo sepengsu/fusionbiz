@@ -1,0 +1,4 @@
+| 오류 발생     | operation = 'error'           |
+| 작동 시작     | operation = 'operating'       |
+| 정지 상태     | operation = 'stopped'         |
+| 날짜별 비교   | GROUP BY Day                  |
