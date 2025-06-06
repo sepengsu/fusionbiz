@@ -2,7 +2,7 @@ import os
 import sqlite3
 import pandas as pd
 
-def load_log_file_to_sqlite(uploaded_file, save_dir="data/raw_file", db_path="data/factory/log.db"):
+def load_log_file_to_sqlite(uploaded_file, save_dir="data/raw_file", db_dir_path="data/factory"):
     os.makedirs(save_dir, exist_ok=True)
 
     # 1. 파일 저장
@@ -25,14 +25,18 @@ def load_log_file_to_sqlite(uploaded_file, save_dir="data/raw_file", db_path="da
             return {"error": f"지원되지 않는 확장자입니다: {ext}"}
     except Exception as e:
         return {"error": f"파일 파싱 실패: {str(e)}"}
-
-    # 4. SQLite 저장
+    
+    # 4. DB 이름 생성
+    db_name = generate_db_name_from_machine_data(file_path)
+    db_path = os.path.join(db_dir_path, db_name)
+    # 5. SQLite 저장
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute("DROP TABLE IF EXISTS machine_log")
-        df.to_sql("machine_log", conn, index=False)
-        row_count = cursor.execute("SELECT COUNT(*) FROM machine_log").fetchone()[0]
+        Name = "logs"  # 테이블 이름 고정
+        cursor.execute(f"DROP TABLE IF EXISTS {Name}")
+        df.to_sql(Name, conn, index=False)
+        row_count = cursor.execute(f"SELECT COUNT(*) FROM {Name}").fetchone()[0]
         conn.commit()
         conn.close()
     except Exception as e:
@@ -43,3 +47,23 @@ def load_log_file_to_sqlite(uploaded_file, save_dir="data/raw_file", db_path="da
         "filename": filename,
         "row_count": row_count
     }
+
+def generate_db_name_from_machine_data(txt_path: str) -> str:
+    df = pd.read_csv(txt_path, sep="\t")
+
+    # 기계 이름 추출 (모든 행 동일하다고 가정)
+    machinename = 'log'
+
+    # 시작 및 종료 시간 추출
+    start = df.iloc[0]
+    end = df.iloc[-1]
+
+    def to_datetime_str(row):
+        return f"{row['Year']:04}{row['Month']:02}{row['Day']:02}"
+
+    start_str = to_datetime_str(start)
+    end_str = to_datetime_str(end)
+
+    db_name = f"{machinename}_{start_str}_{end_str}.db"
+    return db_name
+

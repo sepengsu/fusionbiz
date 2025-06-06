@@ -1,0 +1,39 @@
+    body {
+      background-color: #1e1e1e;
+      color: #d1fae5;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      padding: 30px 10px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #86efac;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #111827;
+      border-bottom: 2px solid #ef4444;
+    }
+    nav a {
+      padding: 15px 30px;
+      text-decoration: none;
+      color: #6ee7b7;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    nav a:hover {
+      background-color: #374151;
+    }
+    nav a.active {
+      border-bottom: 3px solid #ef4444;
+      color: #facc15;
+    }
+    iframe {
+      width: 100%;
+      height: calc(100vh - 120px);
+      border: none;
+    }

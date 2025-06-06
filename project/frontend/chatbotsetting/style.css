@@ -12,9 +12,9 @@ body {
   padding: 40px 20px;
 }
 
-h1 {
+h1, h2 {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: #60a5fa;
 }
 
@@ -23,6 +23,7 @@ h1 {
   padding: 20px;
   margin-bottom: 30px;
   border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
 label {
@@ -43,6 +44,7 @@ textarea {
   background-color: #3a3a3a;
   color: white;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 input[type="range"] {
@@ -52,6 +54,15 @@ input[type="range"] {
 textarea {
   resize: vertical;
   font-family: monospace;
+  line-height: 1.4;
+}
+
+textarea#sqlSystemPrompt {
+  border-left: 4px solid #38bdf8;
+}
+
+textarea#manualSystemPrompt {
+  border-left: 4px solid #f472b6;
 }
 
 .button-container {
@@ -60,7 +71,7 @@ textarea {
 }
 
 button {
-  padding: 10px 20px;
+  padding: 10px 24px;
   font-size: 16px;
   background-color: #10b981;
   color: white;

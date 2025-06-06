@@ -1,23 +1,21 @@
-from fastapi import FastAPI, UploadFile, File, Request, Form
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-import shutil
 import os
-import torch
-import random
 from dotenv import load_dotenv
-
-from rag_engine.processor.chunker import chunk_file
-from rag_engine.processor.vector_saver import save_faiss_index
-from config.config_manager import save_config, load_config
-from rag_engine.chain.routing.chat_router import handle_question
-from rag_engine.processor.db_loader import load_log_file_to_sqlite
-
 # ------------------------- 환경 설정 -------------------------
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 print("env 파일 있음" if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")) else "env 파일 없음")
 print(f"환경 변수 openai_api_key 로딩 완료" if os.getenv("OPENAI_API_KEY") else "환경 변수 openai_api_key 없음")
+
+from fastapi import FastAPI, UploadFile, File, Request, Form
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+import shutil, torch, random
+
+from rag_engine.processor.chunker import chunk_file
+from rag_engine.processor.vector_saver import save_faiss_index, get_embeddings, save_meta_config
+from config.config_manager import save_config, load_config
+from rag_engine.chain.routing.chat_router import handle_question
+from rag_engine.processor.db_loader import load_log_file_to_sqlite
 
 app = FastAPI()
 
@@ -44,7 +42,8 @@ for path in list(CHUNK_BASE.values()) + list(VECTOR_BASE.values()):
 
 # ------------------------- 정적 파일 마운트 -------------------------
 app.mount("/frontend", StaticFiles(directory=BASE_DIR), name="frontend")
-
+app.mount("/config", StaticFiles(directory="config"), name="config")
+# ------------------------- 디바이스 설정 -------------------------
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"[INFO] Using device: {device}")
 
@@ -62,9 +61,10 @@ async def set_chat_config(request: Request):
 
 # ------------------------- 메인 화면 -------------------------
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 def serve_main():
-    return FileResponse(path=os.path.join(BASE_DIR, "index.html"))
+    return RedirectResponse(url="/frontend/index.html")
+
 
 # ------------------------- 데이터 업로드 및 벡터 저장 -------------------------
 
@@ -82,13 +82,31 @@ def upload_log(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    # 청크 및 벡터 저장 경로
     chunk_dir = CHUNK_BASE.get(process_type)
     vector_dir = VECTOR_BASE.get(process_type)
+
+    # 텍스트 chunk 처리
     chunks = chunk_file(file_path, chunk_dir, chunk_size, chunk_overlap)
 
+    # FAISS 인덱스 저장
     index_path = os.path.join(vector_dir, "index.faiss")
     save_faiss_index(chunks, index_path, model_name=embedding_model)
 
+    # 메타 정보 저장
+    vector_dim = len(get_embeddings(["임시"], embedding_model)[0])
+    save_meta_config(
+        save_dir=vector_dir,
+        embedding_model=embedding_model,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        vector_type=vector_type,
+        process_type=process_type,
+        vector_dim=vector_dim,
+        filename=filename
+    )
+
+    # 샘플 텍스트 미리보기
     sample_text = ""
     try:
         chunk_files = [f for f in os.listdir(chunk_dir) if f.endswith(".txt")]
@@ -124,12 +142,21 @@ def ask_question(query: QueryRequest):
 
 @app.get("/api/vector_status")
 def get_vector_status():
-    keys = ["manual", "sql", "log"]
+    import glob
 
     result = {}
-    for key in keys:
+
+    # ✅ LOG: .db 파일 기준
+    log_db_files = glob.glob("data/factory/*.db")
+    result["log"] = {
+        "loaded": len(log_db_files) > 0,
+        "doc_count": len(log_db_files)
+    }
+
+    # ✅ SQL, MANUAL은 기존 방식 유지
+    for key in ["manual", "sql"]:
         try:
-            index_path = os.path.join(VECTOR_BASE.get(key, ""), "index.faiss")
+            index_path = os.path.join(VECTOR_BASE[key], "index.faiss")
             loaded = os.path.exists(index_path)
 
             chunk_dir = CHUNK_BASE.get(key, "")
@@ -148,6 +175,7 @@ def get_vector_status():
             }
 
     return JSONResponse(content=result)
+
 
 
 # ------------------------- db 생성 -------------------------

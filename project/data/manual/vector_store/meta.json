@@ -1,0 +1,9 @@
+{
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "chunk_size": 453,
+  "chunk_overlap": 0,
+  "vector_type": "FAISS",
+  "process_type": "manual",
+  "vector_dim": 384,
+  "filename": "machine_manual.txt"
+}

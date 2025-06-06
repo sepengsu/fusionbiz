@@ -1,71 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tokbom RAG 포털</title>
-  <style>
-    body {
-      background-color: #1e1e1e;
-      color: #d1fae5;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      text-align: center;
-      padding: 30px 10px;
-      font-size: 28px;
-      font-weight: bold;
-      color: #86efac;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      background-color: #111827;
-      border-bottom: 2px solid #ef4444;
-    }
-    nav a {
-      padding: 15px 30px;
-      text-decoration: none;
-      color: #6ee7b7;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    nav a:hover {
-      background-color: #374151;
-    }
-    nav a.active {
-      border-bottom: 3px solid #ef4444;
-      color: #facc15;
-    }
-    iframe {
-      width: 100%;
-      height: calc(100vh - 120px);
-      border: none;
-    }
-  </style>
-  <script>
-    function loadContent(path, clicked) {
-      document.getElementById('content-frame').src = path;
-
-      // active 클래스 업데이트
-      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-      clicked.classList.add('active');
-    }
-  </script>
+  <link rel="stylesheet" href="/frontend/style.css" />
 </head>
 <body>
   <header>
-    Tokbom "RAG로 톡!! BeomAI와 함께 만들어보세요" 🍕
+    SQL CHATBOT "RAG로 만들기"
   </header>
 
   <nav>
-    <a class="active" onclick="loadContent('/frontend/preprocessor/index.html', this)">Retriever</a>
+    <a onclick="loadContent('/frontend/preprocessor/index.html', this)">Retriever</a>
     <a onclick="loadContent('/frontend/chatbotsetting/index.html', this)">Chatbot 설정</a>
     <a onclick="loadContent('/frontend/chatting/index.html', this)">Rag_chatbot</a>
   </nav>
 
-  <iframe id="content-frame" src="/frontend/preprocessor/index.html"></iframe>
+  <iframe id="content-frame"></iframe>
+
+  <script src="/frontend/functions.js"></script>
 </body>
 </html>

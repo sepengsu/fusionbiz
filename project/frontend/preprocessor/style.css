@@ -9,60 +9,51 @@ body {
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 20px 16px;  /* 위아래 패딩 축소 */
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
+h1, h2, h3 {
+  margin: 0 0 16px 0;  /* 상단 여백 제거, 하단만 유지 */
   color: #7dd3fc;
+  text-align: center;
 }
 
 .section {
-  margin-bottom: 30px;
+  margin-bottom: 20px;  /* 섹션 간 간격 줄이기 */
   background-color: #2a2a2a;
-  padding: 20px;
+  padding: 16px;
   border-radius: 8px;
 }
 
 label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-weight: bold;
   color: #facc15;
 }
 
-/* ✅ 드롭다운 확장 스타일 개선 */
-select {
+select,
+input[type="file"],
+input[type="range"],
+textarea {
   width: 100%;
   padding: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;  /* 요소 간 여백 줄이기 */
   border-radius: 5px;
   border: none;
   background-color: #3a3a3a;
   color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+}
 
+select {
   white-space: nowrap;
   overflow-x: auto;
   text-overflow: ellipsis;
-
-  /* ✅ 추가: 길고 많은 옵션 표시 대비 */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-}
-
-/* 화살표 표시를 위한 background-image 등은 필요 시 추가 가능 */
-
-input[type="file"],
-input[type="range"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  border: none;
-  background-color: #3a3a3a;
-  color: white;
 }
 
 input[type="range"] {
@@ -71,13 +62,14 @@ input[type="range"] {
 
 span {
   display: inline-block;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   color: #93c5fd;
 }
 
 .button-container {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 12px;
+  margin-bottom: 8px;
 }
 
 button {
@@ -96,7 +88,7 @@ button:hover {
 }
 
 #statusArea {
-  margin-top: 20px;
+  margin-top: 12px;
   font-weight: bold;
   text-align: center;
   color: #4ade80;
@@ -107,7 +99,7 @@ button:hover {
   text-align: center;
   font-weight: bold;
   color: #facc15;
-  margin-top: 20px;
+  margin-top: 14px;
   animation: blink 1s infinite;
 }
 
@@ -119,15 +111,15 @@ button:hover {
 
 .preview-section {
   background-color: #2e2e2e;
-  padding: 20px;
+  padding: 16px;
   border-radius: 6px;
-  margin-top: 30px;
+  margin-top: 24px;
 }
 
 .preview-content {
-  margin-top: 15px;
+  margin-top: 12px;
   background-color: #1a1a1a;
-  padding: 15px;
+  padding: 12px;
   border-radius: 4px;
   white-space: pre-wrap;
   font-family: monospace;
@@ -137,16 +129,15 @@ button:hover {
 
 /* 로그 업로드 전용 섹션 */
 .log-section {
-  margin-top: 50px;
-  padding: 20px;
+  margin-top: 36px;
+  padding: 16px;
   border: 2px dashed #444;
   background-color: #2a2a2a;
   border-radius: 8px;
 }
 
 .log-section h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin: 0 0 12px 0;
   color: #7dd3fc;
 }
 
@@ -155,7 +146,7 @@ button:hover {
   color: white;
   border: none;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   border-radius: 5px;
   width: 100%;
 }
@@ -177,7 +168,7 @@ button:hover {
 }
 
 #log-upload-result {
-  margin-top: 15px;
+  margin-top: 12px;
   background-color: #1a1a1a;
   border: 1px solid #444;
   padding: 12px;

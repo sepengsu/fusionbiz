@@ -3,6 +3,7 @@ import numpy as np
 import faiss
 import os
 from openai import OpenAI
+import json
 
 def get_embeddings(chunks, model_name):
     if model_name.startswith("openai/"):
@@ -32,3 +33,29 @@ def save_faiss_index(chunks, save_path, model_name="sentence-transformers/all-Mi
     index.add(np.array(vectors))
     faiss.write_index(index, save_path)
     print(f"[✅] FAISS 인덱스 저장 완료: {save_path}")
+
+
+def save_meta_config(
+    save_dir,
+    embedding_model,
+    chunk_size,
+    chunk_overlap,
+    vector_type,
+    process_type,
+    vector_dim,
+    filename=None
+):
+    meta = {
+        "embedding_model": embedding_model,
+        "chunk_size": chunk_size,
+        "chunk_overlap": chunk_overlap,
+        "vector_type": vector_type,
+        "process_type": process_type,
+        "vector_dim": vector_dim,
+        "filename": filename
+    }
+    os.makedirs(save_dir, exist_ok=True)
+    meta_path = os.path.join(save_dir, "meta.json")
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
+    print(f"[📝] meta.json 저장 완료: {meta_path}")

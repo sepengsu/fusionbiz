@@ -1,4 +1,4 @@
-from rag_engine.retriever.manual_retriever import get_top_chunks
+from rag_engine.retriever.retriever import get_top_chunks
 from rag_engine.responder.manual_formatter import generate_manual_response 
 
 def handle_rag_question(question, vector_dir, chunk_dir, device, top_k=5):

@@ -1,21 +1,26 @@
 import sqlite3
-from rag_engine.retriever.sql_retriever import get_top_chunks
+from rag_engine.retriever.retriever import get_top_chunks
 from rag_engine.responder.sql_formatter import (
     generate_sql_prompt_response,
     generate_sql_answer
 )
 
-# SQLite DB 경로 설정
-SQL_DB_PATH = "data/factory/machine_data.db"
+DEFAULT_SQL_DB_PATH = "data/factory/log.db"
 
-def handle_sql_question(question: str, device=None) -> dict:
+def handle_sql_question(question: str, device=None, db_path: str = None) -> dict:
     """
     자연어 질문을 기반으로:
     1. 관련 SQL 예제 검색
     2. GPT로 SQL 생성
     3. SQLite DB 실행
     4. 결과를 자연어 응답으로 반환
+
+    Args:
+        question (str): 사용자 질문
+        device (str): 임베딩 디바이스
+        db_path (str): 사용할 SQLite DB 경로 (기본값 사용 가능)
     """
+    db_path = db_path or DEFAULT_SQL_DB_PATH
 
     # 1. 관련 SQL 예제 청크 검색 (벡터 기반 RAG)
     top_chunks = get_top_chunks(
@@ -35,7 +40,7 @@ def handle_sql_question(question: str, device=None) -> dict:
 
     # 3. SQL 실행 (sqlite3 기준)
     try:
-        conn = sqlite3.connect(SQL_DB_PATH)
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute(sql_code)
         rows = cursor.fetchall()
