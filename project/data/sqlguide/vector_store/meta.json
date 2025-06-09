@@ -1,9 +1,10 @@
 {
   "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
-  "chunk_size": 200,
+  "chunk_size": 308,
   "chunk_overlap": 0,
   "vector_type": "Chroma",
   "process_type": "sql",
   "vector_dim": 384,
-  "filename": "sql_guide.txt"
+  "filename": "sql_guide.txt",
+  "top_k": 3
 }

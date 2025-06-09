@@ -1,9 +1,19 @@
-3. 날짜별 오류 수 추이 보기:
-질문: "날짜별 오류 수를 보고 싶어"
-SQL:
-SELECT Day, COUNT(*) as error_count 
-FROM logs 
-WHERE operation = 'error' 
-GROUP BY Day ORDER BY Day;
+## 6. 시간대별 고장 빈도 파악
+
+질문 예시:
+"하루 중 언제 고장이 가장 많아?"
+
+SQL 예시:
+SELECT Hour, COUNT(*) as error_count  
+FROM logs  
+WHERE operation = 'error'  
+GROUP BY Hour  
+ORDER BY error_count DESC;
+
+설명:  
+시간(Hour) 단위로 고장이 집중된 구간을 파악하여  
+교대 시간, 점검 시점, 설비 가동 간격 등을 조정하는 데 도움을 줍니다.
 
 ---
+
+## 7. 날짜별 기계 고장 발생 빈도 요약

@@ -1,10 +1,18 @@
-- Year (int): 연도
-- Month (int): 월
-- Day (int): 일
-- Hour (int): 시
-- Minute (int): 분
-- operation (str): 상태 값 (예: 'error', 'stopped', 'operating')
+SQL 예시:
+SELECT COUNT(*) FROM logs  
+WHERE Year = 2021 AND Month = 1 AND Day = 29  
+  AND operation = 'error';
 
 ---
 
-📊 [기본 SQL 예시]
+## 2. 특정 시간대의 정지 횟수
+
+질문 예시:
+"오전 9시에 정지 몇 번?"
+
+SQL 예시:
+SELECT COUNT(*) FROM logs  
+WHERE Year = 2021 AND Month = 1 AND Day = 29  
+  AND Hour = 9 AND operation = 'stopped';
+
+---

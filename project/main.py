@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 # ------------------------- 환경 설정 -------------------------
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
-print("env 파일 있음" if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")) else "env 파일 없음")
-print(f"환경 변수 openai_api_key 로딩 완료" if os.getenv("OPENAI_API_KEY") else "환경 변수 openai_api_key 없음")
+print("env 파일 있음" if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")) else "env 파일 없음",end=" ,")
+print(f"환경 변수 openai_api_key 로딩 완료" if os.getenv("OPENAI_API_KEY") else "환경 변수 openai_api_key 없음", end=" ,")
 
 from fastapi import FastAPI, UploadFile, File, Request, Form
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
@@ -14,7 +14,6 @@ import shutil, torch, random
 from rag_engine.processor.chunker import chunk_file
 from rag_engine.processor.vector_saver import save_faiss_index, get_embeddings, save_meta_config
 from config.config_manager import save_config, load_config
-from rag_engine.chain.routing.chat_router import handle_question
 from rag_engine.processor.db_loader import load_log_file_to_sqlite
 
 app = FastAPI()
@@ -55,9 +54,15 @@ def get_chat_config():
 
 @app.post("/chat_config")
 async def set_chat_config(request: Request):
-    config = await request.json()
-    save_config(config)
+    new_config = await request.json()
+    current_config = load_config()
+
+    # 🔁 기존 설정과 병합
+    merged_config = {**current_config, **new_config}
+    
+    save_config(merged_config)
     return {"message": "✅ 설정이 저장되었습니다."}
+
 
 # ------------------------- 메인 화면 -------------------------
 
@@ -129,14 +134,33 @@ def upload_log(
 class QueryRequest(BaseModel):
     question: str
 
+from fastapi.responses import JSONResponse
+from rag_engine.chain.full_chain import build_full_chain
+from config.config_manager import load_config
+from langchain_openai import ChatOpenAI
+import traceback, re
+from rag_engine.chain.full_chain_loader import get_cached_full_chain
+
 @app.post("/ask")
 def ask_question(query: QueryRequest):
-    result = handle_question(
-        question=query.question,
-        vector_dir_map=VECTOR_BASE,
-        device=device
-    )
-    return result
+    try:
+        full_chain = get_cached_full_chain()
+        if not full_chain:
+            return JSONResponse(content={"error": "체인이 초기화되지 않았습니다."}, status_code=500)
+
+        result = full_chain.invoke(
+            {"question": query.question},
+            config={"configurable": {"session_id": "default"}}
+        )
+        response = result.get("response", "")
+        clean_response = re.sub(r"[*_#`]", "", response)
+        return JSONResponse(content={"answer": clean_response})
+
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e), "trace": traceback.format_exc()}
+
+
 
 # ------------------------- 벡터 상태 확인 -------------------------
 

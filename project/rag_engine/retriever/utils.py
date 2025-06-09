@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 import faiss
 import os, json
+from langchain_community.embeddings import OpenAIEmbeddings
 
 def load_index(index_path):
     if not os.path.exists(index_path):
@@ -22,7 +23,10 @@ def load_index_and_model_with_meta(vector_dir):
     model_name = meta["embedding_model"]
     expected_dim = meta["vector_dim"]
 
-    model = SentenceTransformer(model_name)
+    if "openai" in model_name:
+        model = OpenAIEmbeddings(model=model_name)
+
+    model = SentenceTransformer(model_name) 
     index = faiss.read_index(index_path)
 
     return model, index, expected_dim

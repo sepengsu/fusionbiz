@@ -25,7 +25,8 @@ def load_log_file_to_sqlite(uploaded_file, save_dir="data/raw_file", db_dir_path
             return {"error": f"지원되지 않는 확장자입니다: {ext}"}
     except Exception as e:
         return {"error": f"파일 파싱 실패: {str(e)}"}
-    
+    # 3.1. 컬럼 이름 정리
+    df.columns = df.columns.str.strip()
     # 4. DB 이름 생성
     db_name = generate_db_name_from_machine_data(file_path)
     db_path = os.path.join(db_dir_path, db_name)
@@ -60,7 +61,8 @@ def generate_db_name_from_machine_data(txt_path: str) -> str:
 
     def to_datetime_str(row):
         return f"{row['Year']:04}{row['Month']:02}{row['Day']:02}"
-
+    
+    print(f"Start: {start}, End: {end}")
     start_str = to_datetime_str(start)
     end_str = to_datetime_str(end)
 

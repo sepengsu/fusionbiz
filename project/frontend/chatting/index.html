@@ -9,14 +9,38 @@
 <body>
   <main class="container">
     <section class="guide">
-      <h2>🧠 RAG Chatbot 사용 가이드</h2>
-      <ul>
-        <li><strong>질문하기:</strong> 업로드한 문서 내용과 관련된 질문을 입력합니다</li>
-        <li><strong>답변 확인:</strong> AI가 문서에서 관련 정보를 찾아 답변합니다</li>
-        <li><strong>참고 문서 확인:</strong> AI가 참고한 내용을 표시합니다</li>
-        <li><strong>대화 초기화:</strong> 새 주제의 대화를 시작할 수 있습니다</li>
-        <li><span class="warning-text">⚠️ 먼저 Retriever 탭에서 문서를 업로드하고 처리하세요.</span></li>
-      </ul>
+    <h2>🧠 RAG Chatbot 사용 가이드</h2>
+    <ul>
+      <li><strong>질문하기:</strong> 업로드한 문서 내용과 관련된 질문을 입력합니다</li>
+      <li><strong>답변 확인:</strong> AI가 문서에서 관련 정보를 찾아 답변합니다</li>
+      <li><strong>참고 문서 확인:</strong> AI가 참고한 내용을 표시합니다</li>
+      <li><strong>대화 초기화:</strong> 새 주제의 대화를 시작할 수 있습니다</li>
+
+      <li><strong>질문 유형 예시 및 필수 키워드:</strong>
+        <ul>
+          <li><strong>[SQL 분석]</strong>  
+            <br/>예: 정지 횟수 알려줘, 에러 로그 개수 보여줘  
+            <br/><em>💡 꼭 포함할 키워드:</em> <code>쿼리</code>, <code>sql</code>, <code>횟수를 알려줘</code>
+          </li>
+          <li><strong>[메뉴얼/점검 안내]</strong>  
+            <br/>예: 왜 고장났는지 알려줘, 점검 방법이 뭐야?  
+            <br/><em>💡 꼭 포함할 키워드:</em> <code>매뉴얼</code>, <code>고장 분석 방법</code>, <code>점검 방법</code>
+          </li>
+          <li><strong>[로그 요약]</strong>  
+            <br/>예: 운전 로그 요약해줘, 정지 횟수 정리해줘  
+            <br/><em>💡 꼭 포함할 키워드:</em> <code>요약</code>, <code>보고서</code>, <code>분석</code>, <code>로그 요약</code>, <code>운전 로그 요약</code>
+          </li>
+        </ul>
+      </li>
+
+      <li><strong>📅 기준일 및 기간 설정:</strong> 
+        질문에 <em>“기준일 + 최근 N일간”</em> 형식으로 기간을 포함하면 원하는 기간만 분석합니다<br/>
+        <small>예: <code>6월 1일 기준 최근 3일간 정지 원인 알려줘</code></small>
+      </li>
+
+      <li><span class="warning-text">⚠️ 먼저 Retriever 탭에서 문서를 업로드하고 처리하세요.</span></li>
+    </ul>
+
     </section>
 
     <section class="chat-box">

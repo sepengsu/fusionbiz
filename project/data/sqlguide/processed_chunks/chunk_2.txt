@@ -1,7 +1,23 @@
-1. 특정 날짜에 발생한 오류 개수:
-질문: "1월 29일 오류 몇 번?"
-SQL: 
-SELECT COUNT(*) FROM logs 
-WHERE Year = 2021 AND Month = 1 AND Day = 29 AND operation = 'error';
+## 3. 날짜별 오류 수 추이 보기
+
+질문 예시:
+"날짜별 오류 수를 보고 싶어"
+
+SQL 예시:
+SELECT Day, COUNT(*) as error_count  
+FROM logs  
+WHERE operation = 'error'  
+GROUP BY Day  
+ORDER BY Day;
+
+---
+
+## 4. 오류 후 정지로 이어진 경우의 비율
+
+질문 예시:
+"오류가 정지로 이어진 경우는 몇 %야?"
+
+SQL 설명:
+SQL 단독으로는 어려움. 시간순 정렬 후 `lag` 분석이 필요하여 Python 처리 권장.
 
 ---

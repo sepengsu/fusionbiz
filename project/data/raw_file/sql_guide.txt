@@ -1,60 +1,160 @@
-질문: "1월 29일 오류 몇 번?"
-SQL: 
-SELECT COUNT(*) FROM logs 
-
-WHERE Year = 2021 AND Month = 1 AND Day = 29 AND Operation = 'error';
+# 📊 SQL 쿼리 가이드 문서 (공장 로그 분석용)
 
 ---
 
-2. 특정 시간대의 정지 횟수:
+## ✅ 사용 가능한 컬럼 목록
 
-질문: "오전 9시에 정지 몇 번?"
-SQL:
-SELECT COUNT(*) FROM logs 
-
-WHERE Year = 2021 AND Month = 1 AND Day = 29 AND Hour = 9 AND Operation = 'stopped';
-
----
-
-3. 날짜별 오류 수 추이 보기:
-
-질문: "날짜별 오류 수를 보고 싶어"
-SQL:
-SELECT Day, COUNT(*) as error_count 
-
-FROM logs 
-WHERE Operation = 'error' 
-GROUP BY Day ORDER BY Day;
+- Year: 연도 (예: 2021)
+- Month: 월 (1~12)
+- Day: 일 (1~31)
+- Hour: 시간 (0~23)
+- Minute: 분 (0~59)
+- operation: 작동 상태 (operating, stopped, error)
+- Machine: 기계 이름 또는 종류
 
 ---
 
-4. 오류 후 정지로 이어진 경우의 비율:
+## 1. 특정 날짜의 오류 횟수
 
-질문: "오류가 정지로 이어진 경우는 몇 %야?"
-SQL (가능한 처리):
-→ 시간순 정렬 후 lag 사용 필요 (Python 처리 권장)
+질문 예시:
+"1월 29일 오류 몇 번?"
 
-
----
-
-📘 [주의사항]
-
-- 모든 필드는 int 또는 str 타입입니다.
-- 날짜 계산 시 'Hour', 'Minute'를 함께 고려해야 정밀도 향상
-- 복합 조건(ex. 오류+정지+작동)은 순서 정보가 필요하며 SQL만으로는 어려울 수 있음
+SQL 예시:
+SELECT COUNT(*) FROM logs  
+WHERE Year = 2021 AND Month = 1 AND Day = 29  
+  AND operation = 'error';
 
 ---
 
-🧠 [용어 매핑 힌트]
+## 2. 특정 시간대의 정지 횟수
 
-| 자연어 표현     | SQL 표현 예시                      |
-|--------------|-------------------------------|
-| 몇 번         | COUNT(*)                       |
-| 언제          | WHERE Hour = ...              |
-| 오류 발생     | Operation = 'error'           |
-| 작동 시작     | Operation = 'operating'       |
-| 정지 상태     | Operation = 'stopped'         |
-| 날짜별 비교   | GROUP BY Day                  |
+질문 예시:
+"오전 9시에 정지 몇 번?"
+
+SQL 예시:
+SELECT COUNT(*) FROM logs  
+WHERE Year = 2021 AND Month = 1 AND Day = 29  
+  AND Hour = 9 AND operation = 'stopped';
 
 ---
 
+## 3. 날짜별 오류 수 추이 보기
+
+질문 예시:
+"날짜별 오류 수를 보고 싶어"
+
+SQL 예시:
+SELECT Day, COUNT(*) as error_count  
+FROM logs  
+WHERE operation = 'error'  
+GROUP BY Day  
+ORDER BY Day;
+
+---
+
+## 4. 오류 후 정지로 이어진 경우의 비율
+
+질문 예시:
+"오류가 정지로 이어진 경우는 몇 %야?"
+
+SQL 설명:
+SQL 단독으로는 어려움. 시간순 정렬 후 `lag` 분석이 필요하여 Python 처리 권장.
+
+---
+
+## 5. 기계별 오류/정지 횟수 요약
+
+질문 예시:
+"기계별로 정지 몇 번 있었어?"
+
+SQL 예시:
+SELECT Machine, COUNT(*) as stopped_count  
+FROM logs  
+WHERE operation = 'stopped'  
+GROUP BY Machine  
+ORDER BY stopped_count DESC;
+
+설명:  
+각 기계(Machine) 별로 정지 상태가 얼마나 자주 발생했는지 집계합니다.  
+전체 운영 상태를 파악하거나 우선 점검 대상 기계를 선정할 때 유용합니다.
+
+---
+
+## 6. 시간대별 고장 빈도 파악
+
+질문 예시:
+"하루 중 언제 고장이 가장 많아?"
+
+SQL 예시:
+SELECT Hour, COUNT(*) as error_count  
+FROM logs  
+WHERE operation = 'error'  
+GROUP BY Hour  
+ORDER BY error_count DESC;
+
+설명:  
+시간(Hour) 단위로 고장이 집중된 구간을 파악하여  
+교대 시간, 점검 시점, 설비 가동 간격 등을 조정하는 데 도움을 줍니다.
+
+---
+
+## 7. 날짜별 기계 고장 발생 빈도 요약
+
+질문 예시:
+"날짜별로 어떤 기계가 자주 고장났는지 보고 싶어"
+
+SQL 예시:
+SELECT Day, Machine, COUNT(*) as error_count  
+FROM logs  
+WHERE operation = 'error'  
+GROUP BY Day, Machine  
+ORDER BY Day, error_count DESC;
+
+설명:  
+기계별로 어떤 날짜에 오류가 집중되었는지 파악할 수 있어  
+특정 일자에 문제가 있었는지 조사하거나 정비 일지를 분석할 때 활용됩니다.
+
+---
+
+## 8. 정지와 오류가 반복된 횟수 (복합 조건 예시)
+
+질문 예시:
+"같은 날 정지랑 오류가 둘 다 있었던 경우는 몇 번?"
+
+SQL 예시 (가능한 처리):
+SELECT COUNT(DISTINCT Day)  
+FROM logs  
+WHERE operation IN ('error', 'stopped');
+
+설명:  
+날짜별로 정지와 오류가 모두 있었던 날을 파악할 수는 있지만  
+이 둘의 '순서 관계'나 '연속 발생'은 SQL만으로는 정확히 분석하기 어렵습니다.  
+→ Python 처리 또는 시간순 이벤트 분석 필요
+
+---
+
+## 🔄 요약 기반 응답 생성 힌트
+
+- 기계 상태 요약 시에는 **정지/오류 횟수, 최근 발생 시점, 집중 시간대**를 함께 제시
+- 질문이 “~많았던 기계”, “~집중된 시간”이면 `GROUP BY + COUNT + ORDER BY` 패턴으로 접근
+- 질문이 “~경향을 알려줘”면 → SQL 결과를 기반으로 **GPT 요약 모델에게 전달**
+
+
+## 🧠 자연어 표현 → SQL 용어 매핑
+
+| 자연어 표현   | SQL 표현 예시         |
+|--------------|------------------------|
+| 몇 번        | COUNT(*)               |
+| 언제         | WHERE Hour = ...       |
+| 오류 발생    | operation = 'error'    |
+| 작동 상태    | operation = 'operating'|
+| 정지 상태    | operation = 'stopped'  |
+| 날짜별 비교  | GROUP BY Day           |
+
+---
+
+## 💡 사용 팁
+
+- 정밀한 시간 조건이 필요하면 `Hour`, `Minute`을 함께 사용
+- 이벤트 순서를 고려한 복합 분석은 Python 처리 필요
+- 기계명을 조건에 추가할 수 있음 (e.g., Machine = 'CNC1')

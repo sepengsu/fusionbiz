@@ -43,7 +43,8 @@ def save_meta_config(
     vector_type,
     process_type,
     vector_dim,
-    filename=None
+    filename=None,
+    top_k=3  # 🔹 추가
 ):
     meta = {
         "embedding_model": embedding_model,
@@ -52,6 +53,7 @@ def save_meta_config(
         "vector_type": vector_type,
         "process_type": process_type,
         "vector_dim": vector_dim,
+        "top_k": top_k,  # 🔹 추가
         "filename": filename
     }
     os.makedirs(save_dir, exist_ok=True)

@@ -136,6 +136,7 @@ body {
 }
 
 .chat.bot {
+  white-space: pre-line;
   background-color: #4b5563;
   color: white;
   margin-right: auto;

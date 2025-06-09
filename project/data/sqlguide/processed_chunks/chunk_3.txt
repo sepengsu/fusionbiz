@@ -1,7 +1,17 @@
-2. 특정 시간대의 정지 횟수:
-질문: "오전 9시에 정지 몇 번?"
-SQL:
-SELECT COUNT(*) FROM logs 
-WHERE Year = 2021 AND Month = 1 AND Day = 29 AND Hour = 9 AND operation = 'stopped';
+## 5. 기계별 오류/정지 횟수 요약
+
+질문 예시:
+"기계별로 정지 몇 번 있었어?"
+
+SQL 예시:
+SELECT Machine, COUNT(*) as stopped_count  
+FROM logs  
+WHERE operation = 'stopped'  
+GROUP BY Machine  
+ORDER BY stopped_count DESC;
+
+설명:  
+각 기계(Machine) 별로 정지 상태가 얼마나 자주 발생했는지 집계합니다.  
+전체 운영 상태를 파악하거나 우선 점검 대상 기계를 선정할 때 유용합니다.
 
 ---

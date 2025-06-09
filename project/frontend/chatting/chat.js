@@ -20,12 +20,17 @@ async function ask() {
     const data = await res.json();
     const botChat = document.createElement('div');
     botChat.className = 'chat bot';
-    botChat.innerText = data.answer || JSON.stringify(data, null, 2);
+    botChat.innerHTML = new DOMParser()
+      .parseFromString(data.answer, 'text/html')
+      .body.innerHTML;
+
     document.getElementById('chatHistory').appendChild(botChat);
+
+
   } catch (err) {
     const errorChat = document.createElement('div');
     errorChat.className = 'chat bot error';
-    errorChat.innerText = "❌ 오류 발생: " + err.message;
+    errorChat.innerHTML = "❌ 오류 발생: " + err.message;
     document.getElementById('chatHistory').appendChild(errorChat);
   }
 }
@@ -63,7 +68,12 @@ async function updateStatus() {
     });
   }
 }
-
+document.getElementById("userInput").addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); // 폼 제출 방지
+    document.getElementById("sendBtn").click(); // 버튼 클릭 실행
+  }
+});
 document.addEventListener('DOMContentLoaded', () => {
   resetChat();
   updateStatus();

@@ -1,4 +1,8 @@
-| 오류 발생     | operation = 'error'           |
-| 작동 시작     | operation = 'operating'       |
-| 정지 상태     | operation = 'stopped'         |
-| 날짜별 비교   | GROUP BY Day                  |
+| 자연어 표현   | SQL 표현 예시         |
+|--------------|------------------------|
+| 몇 번        | COUNT(*)               |
+| 언제         | WHERE Hour = ...       |
+| 오류 발생    | operation = 'error'    |
+| 작동 상태    | operation = 'operating'|
+| 정지 상태    | operation = 'stopped'  |
+| 날짜별 비교  | GROUP BY Day           |

@@ -1,8 +1,15 @@
-4. 오류 후 정지로 이어진 경우의 비율:
-질문: "오류가 정지로 이어진 경우는 몇 %야?"
-SQL (가능한 처리):
-→ 시간순 정렬 후 lag 사용 필요 (Python 처리 권장)
+질문 예시:
+"날짜별로 어떤 기계가 자주 고장났는지 보고 싶어"
+
+SQL 예시:
+SELECT Day, Machine, COUNT(*) as error_count  
+FROM logs  
+WHERE operation = 'error'  
+GROUP BY Day, Machine  
+ORDER BY Day, error_count DESC;
+
+설명:  
+기계별로 어떤 날짜에 오류가 집중되었는지 파악할 수 있어  
+특정 일자에 문제가 있었는지 조사하거나 정비 일지를 분석할 때 활용됩니다.
 
 ---
-
-📘 [주의사항]
